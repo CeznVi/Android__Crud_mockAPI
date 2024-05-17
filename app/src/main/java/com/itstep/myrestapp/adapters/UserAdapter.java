@@ -51,12 +51,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 u.delete(user, new UserRepository.DataUpdateCallback() {
                     @Override
                     public void onDataUpdated() {
-                        // Убедитесь, что удаление происходит в основном потоке
-                        if (position >= 0 && position < userList.size()) {
-                            userList.remove(position);
-                            notifyItemRemoved(position);
-                            notifyItemRangeChanged(position, userList.size());
-                        }
+                        holder.itemView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                int position = holder.getAdapterPosition();
+                                if (position != RecyclerView.NO_POSITION) {
+                                    userList.remove(position);
+                                    notifyItemRemoved(position);
+                                    notifyItemRangeChanged(position, userList.size());
+                                }
+                            }
+                        });
                     }
 
                     @Override
@@ -90,6 +95,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public int getItemCount() {
         return userList.size();
+    }
+
+    public void updateUserList(ArrayList<UserModel> newUserList) {
+        userList.clear();
+        userList.addAll(newUserList);
+        notifyDataSetChanged();
     }
 
     static class UserViewHolder extends RecyclerView.ViewHolder {

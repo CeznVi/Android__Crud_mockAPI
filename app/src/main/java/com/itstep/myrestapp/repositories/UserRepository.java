@@ -32,6 +32,7 @@ public class UserRepository implements RepositoryInterface<UserModel>
             @Override
             public void onResponse(Call<ArrayList<UserModel>> call, Response<ArrayList<UserModel>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    data.clear(); // Очистить текущие данные перед добавлением новых
                     data.addAll(response.body());
                     callback.onDataLoaded(data);
                 } else {
