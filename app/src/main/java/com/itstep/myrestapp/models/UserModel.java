@@ -1,5 +1,7 @@
 package com.itstep.myrestapp.models;
 
+import androidx.annotation.NonNull;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -9,8 +11,6 @@ public class UserModel {
 
     private String avatar;
     private Date createdAt;
-
-
 
     public int getId() {
         return id;
@@ -42,6 +42,14 @@ public class UserModel {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "ToString: " + this.name;
     }
 }
 
