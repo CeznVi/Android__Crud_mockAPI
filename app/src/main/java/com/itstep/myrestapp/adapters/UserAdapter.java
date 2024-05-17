@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.itstep.myrestapp.R;
 import com.itstep.myrestapp.models.UserModel;
+import com.itstep.myrestapp.repositories.UserRepository;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -24,6 +26,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public UserAdapter(ArrayList<UserModel> userList) {
         this.userList = userList;
     }
+
+
 
     @NonNull
     @Override
@@ -38,6 +42,33 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         UserModel user = userList.get(position);
         holder.nameTextView.setText(user.getName());
         holder.createdAtTextView.setText(user.getCreatedAt().toString());
+
+        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                UserRepository u = UserRepository.getInstance();
+                u.delete(user, new UserRepository.DataUpdateCallback() {
+                    @Override
+                    public void onDataUpdated() {
+                        // Убедитесь, что удаление происходит в основном потоке
+                        if (position >= 0 && position < userList.size()) {
+                            userList.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, userList.size());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // Обработка ошибки
+                    }
+                });
+
+
+            }
+        });
+
         Log.d("UserAdapter", "Loading image URL: " + user.getAvatar());
 
         if(user.getAvatar().isEmpty()) return;
@@ -65,17 +96,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         ImageView avatarImageView;
         TextView nameTextView;
         TextView createdAtTextView;
+        Button deleteButton;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             avatarImageView = itemView.findViewById(R.id.avatarImageView);
             nameTextView = itemView.findViewById(R.id.nameTextView);
             createdAtTextView = itemView.findViewById(R.id.createdAtTextView);
+            deleteButton = itemView.findViewById(R.id.deleteButton);
+
         }
     }
 
-    private void loadImageFromUrl(String url, ImageView imageView) {
-        Picasso.get().load(url).into(imageView);
-    }
+
+
+
 
 }

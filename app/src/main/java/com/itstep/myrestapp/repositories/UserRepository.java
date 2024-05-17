@@ -1,14 +1,10 @@
 package com.itstep.myrestapp.repositories;
 
-import android.util.Log;
-import android.widget.ImageView;
-
 import com.itstep.myrestapp.clients.MockApiClient;
 import com.itstep.myrestapp.models.UserModel;
 import com.itstep.myrestapp.services.UserApiService;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -86,75 +82,30 @@ public class UserRepository implements RepositoryInterface<UserModel>
         return data.size();
     }
 
+    public void delete(UserModel user, DataUpdateCallback callback) {
+        Call<Void> call = apiService.delete(user.getId());
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    data.remove(user);
+                    callback.onDataUpdated();
+                } else {
+                    callback.onError(new Exception("Error deleting user: " + response.message()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                callback.onError((Exception) t);
+            }
+        });
+    }
 
 
-//    public void getAll() {
-//        Call<ArrayList<UserModel>> call = apiService.getAll();
-//        call.enqueue(new Callback<ArrayList<UserModel>>() {
-//            @Override
-//            public void onResponse(Call<ArrayList<UserModel>> call, Response<ArrayList<UserModel>> response) {
-//                if (response.isSuccessful()) {
-//                    ArrayList<UserModel> userModels =  new ArrayList<>();
-//                    userModels.addAll(response.body());
-//                    for (int i = 0; i < userModels.size(); i++) {
-//                        Log.d("keeper", userModels.get(i).getAvatar());
-//                    }
-//                } else {
-//                    // Обработка ошибки
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ArrayList<UserModel>> call, Throwable t) {
-//                // Обработка ошибки
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public UserModel create(UserModel newModel) {
-//        // 1 min
-//        data.add(newModel);
-//
-//        // Вызываем метод создания пользователя
-//        Call<UserModel> call = apiService.create(newModel);
-//
-//        // Асинхронный вызов, добавляем обработчик для ответа и ошибок
-//        call.enqueue(new Callback<UserModel>() {
-//            @Override
-//            public void onResponse(Call<UserModel> call, Response<UserModel> response) {
-//                if (response.isSuccessful()) {
-//                    // Запрос успешно выполнен, обрабатываем ответ
-//                    UserModel createdUser = response.body();
-//                    System.out.println("Пользователь успешно создан: " + createdUser);
-//                } else {
-//                    // Обработка ошибки
-//                    System.out.println("Ошибка при создании пользователя: " + response.message());
-//                    // Здесь вы можете выполнить дополнительные действия в зависимости от ошибки
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<UserModel> call, Throwable t) {
-//                // Ошибка при выполнении запроса
-//                System.out.println("Ошибка при отправке запроса: " + t.getMessage());
-//                // Здесь вы можете выполнить дополнительные действия при ошибке сети или других проблемах
-//            }
-//        });
-//
-//        return newModel;
-//    }
-//
-//    @Override
-//    public UserModel createModel() {
-//        return new UserModel();
-//    }
-//
-//    public ArrayList<UserModel> getDataFromRepo(){
-//        return data;
-//    }
-//
-//    public int getSize(){
-//        return data.size();
-//    }
+    public interface DataUpdateCallback {
+        void onDataUpdated();
+        void onError(Exception e);
+    }
+
 }
