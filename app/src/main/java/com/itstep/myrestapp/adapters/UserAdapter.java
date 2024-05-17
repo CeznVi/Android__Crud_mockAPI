@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +16,6 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
@@ -40,7 +40,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.createdAtTextView.setText(user.getCreatedAt().toString());
         Log.d("UserAdapter", "Loading image URL: " + user.getAvatar());
 
-
+        if(user.getAvatar().isEmpty()) return;
         Picasso.get().load(user.getAvatar()).into(holder.avatarImageView, new Callback() {
             @Override
             public void onSuccess() {
